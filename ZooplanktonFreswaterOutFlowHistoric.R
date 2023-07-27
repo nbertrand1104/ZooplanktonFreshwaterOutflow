@@ -90,13 +90,17 @@ allpf<- rbind.data.frame(Pforbesi_ad,Pforbesi_juv)
 view(allpf)
 ##########################
 ##########
-
-plt1<- ggplot(allpf,aes(x = as.Date(Date), y = CPUE))+
+#exploring the within year distribution of the CPUE 
+class(allpf$Date)
+plt1<- ggplot(allpf,aes(x = Date, y = CPUE))+
   geom_point()+
   facet_wrap(year(as.Date(Date)))
 plt1
+allpfy <- allpf %>% mutate(year= year(Date), month = month(Date))
 
-as.POSIXlt()
+ggplot(allpfy, aes(x=month(Date), y=CPUE)) +
+  geom_point()+
+  facet_wrap(vars(year))
 
 
 ##############
@@ -104,11 +108,11 @@ as.POSIXlt()
 
 library(readr)
 negbinmodel_daily_dataset <- read_csv("Data/negbinmodel_daily_dataset.csv")
-View(negbinmodel_daily_dataset)
+#View(negbinmodel_daily_dataset)
 
 outflow <- negbinmodel_daily_dataset %>%  select(date, delta_outflow)
 
-view(outflow)
+#view(outflow)
 
 
 pforbesi_ad_flow <-left_join(outflow, Pforbesi_ad, by = join_by(date == Date))
@@ -161,3 +165,18 @@ plot(CPUE_mean ~delta_outflow_mean, data = annualmeans)
 
 model.lm<- lm(CPUE_mean ~delta_outflow_mean, data = annualmeans)
 summary(model.lm)
+
+#############################
+###################
+
+pfall_flow <-left_join(outflow, allpf, by = join_by(date == Date))
+view(pfall_flow)
+
+ggplot(pfall_flow, aes(x=delta_outflow, y=CPUE)) +
+  geom_point(size=2, shape=23)+
+  scale_y_log10()+
+  geom_smooth()
+
+g
+
+
